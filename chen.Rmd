@@ -26,3 +26,23 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## packages
+
+啟動 package
+```{r}
+library(googlesheets4)
+library(dplyr)
+library(lubridate)
+```
+
+## creat object
+```{r}
+a <- 2
+a = 2 # = 與 <-同義
+```
+```{r}
+3 -> b
+```
+
+
