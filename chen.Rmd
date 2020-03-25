@@ -45,19 +45,114 @@ a = 2 # = 與 <-同義
 ```
 ```{r}
 my_108_total_credits <- 15
+```
+
+
+```{r}
 _108_total_credits <- 15
 108_total_credits <- 15
 _my_108_total_credits <- 15
 my.108.total_credits <- 15
 .108.total_credits <- 15  #.後不可加數字
 .my.108.total_credits <- 15 # 隱藏變數
-我的108學年總學分數 <- 15# 特殊名稱處理，`不是名稱的一部份
+`我的108學年總學分數` <- 15 # 特殊名稱處理，`不是名稱的一部份
 `.108.total_credits` <- 15
 ```
 ```{r}
 `我的年紀` <- 20
 my_age <- `我的年紀`
 ```
+
+## Atomic vector
+```{r}
+num1 <- 5
+vNum1 <- c(2,5)
+vNum2 <- c(2, num1)
+```
+Stacking vectors
+```{r}
+vNum1 <- c(-1,5)
+vNum2 <- c(2,3)
+vNum3 <- c(vNum1,vNum2)
+vNum4 <- c(-1,5,2,3)
+vNum5 <- c(c(-1,5),c(2,3))
+```
+```{r}
+vNum1 <- c(-1,5)
+vNum2 <- c(2,3)
+vNum4 <- c() # 空向量
+```
+```{r}
+vNum3 <- c(vNum2, vNum1)
+vNum4 <- c(vNum4, vNum1) # 向量疊代 （recursive vector concatenate）
+```
+## Different types
+#numeric
+```{r}
+num1<-5 # 非整數
+num2<-5L # 整數
+
+num1Vector<-c(5,6,7)
+num2Vector<-c(5L,6L,7L)
+```
+```{r}
+typeof(num1Vector)
+typeof(num2Vector)
+```
+#character
+```{r}
+char1<-"你好"
+char2<-'你好'
+```
+他說:"今天多一個確診"
+```{r}
+Hi <- "他說:\"今天多一個確診\""
+Hi <- '他說:"今天多一個確診"'
+```
+#logical
+```{r}
+library(httr)
+library(dplyr)
+GET("https://api.github.com/repos/roujyun/108-2-56-inclass-practice/commits") %>%
+  content() %>%
+  View()
+
+```
+```{r}
+library(googlesheets4)
+`出席狀況表單網址` <-"https://docs.google.com/spreadsheets/d/1EAG49qDKPWWi0ebkVr29TLrvVnoBPfkvxYY-J3xLAHY/edit#gid=458686645"
+ss <- as_sheets_id(`出席狀況表單網址`)
+homework_sheet <- sheets_read(ss,sheet=1)
+```
+#logics
+```{r}
+logi1 <- c(T,TRUE,F,FALSE,FALSE)
+```
+```{r}
+sum(logi1 )
+```
+#
+```{r}
+# 10位學生的主系
+majors10_char <-  c('經濟學系','社會學系','社會學系','經濟學系','經濟學系','社會學系','經濟學系','經濟學系','經濟學系','社會學系')
+
+typeof(majors10_char)
+class(majors10_char)
+```
+```{r}
+majors10_factor <- factor(majors10_char)
+# 或
+majors10_factor <- factor(
+  c('經濟學系','社會學系','社會學系','經濟學系','經濟學系','社會學系','經濟學系','經濟學系','經濟學系','社會學系')
+)
+
+typeof(majors10_factor)
+class(majors10_factor)
+```
+```{r}
+levels(majors10_factor)
+```
+
 
 
 
