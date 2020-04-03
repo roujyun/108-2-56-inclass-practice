@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584510031936.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AC93E146",
+    "lastKnownWriteTime" : 1584510474,
+    "last_content_update" : 1584510474,
+    "path" : "~/GitHub/108-2-56-inclass-practice/chen1.Rmd",
+    "project_path" : "chen1.Rmd",
+    "properties" : {
+        "cursorPosition" : "28,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
