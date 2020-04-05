@@ -1,0 +1,4 @@
+"0","save(commit,temperature,file = ""0401.Rda"")"
+"2","Error in save(commit, temperature, file = ""0401.Rda"") : 
+  objects ‘commit’, ‘temperature’ not found
+"

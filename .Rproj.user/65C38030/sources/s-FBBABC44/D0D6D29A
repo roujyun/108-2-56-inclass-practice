@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1586078349657.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D0D6D29A",
+    "lastKnownWriteTime" : 7887319652481655922,
+    "last_content_update" : 1586078349657,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "id" : "206ebc080f204708b914c4ae47bd6072",
+        "name" : "weather",
+        "title" : "weather"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "object_explorer"
+}

@@ -229,3 +229,92 @@ studentTime<-c(
 studentTime
 ```
 
+
+##list
+```{r}
+listexample <- list(2,6,7)
+factorexample <- c(2,6,7)
+listexample 
+factorexample
+
+```
+每個元素值可以是不同type的物件值
+```{r}
+library(lubridate)
+"小明交易1" <- list(
+  ymd_hms("2020-03-31T13:40:55Z"),
+  "一芳", 
+  2,
+  "水果茶"
+)
+print("小明交易1")
+```
+```{r}
+#用vector
+`小明108學年課表A` <- c(
+  c("108-1","高級會計學","高等統計學"),
+  c("108-2","食在拉丁美洲")
+)
+print(`小明108學年課表A`)
+#用list
+`小明108學年課表A` <- list(
+  c("108-1","高級會計學","高等統計學"),
+  c("108-2","食在拉丁美洲")
+)
+print(`小明108學年課表A`)
+
+```
+```{r}
+# list含兩個lists
+`小明108學年課表B` <- list(
+  list("108-1","高級會計學","高等統計學"),
+  list("108-2","食在拉丁美洲")
+)
+print(`小明108學年課表B`)
+```
+```{r}
+# list含兩個lists, 子層list又各含兩個vectors
+`小明108學年課表C` <- list(
+  `108學年第1學期`=list(
+    semester=c("108-1"),
+    courses=c("高級會計學","高等統計學")
+       ),
+  `108學年第2學期`=list(
+    semester=c("108-2"),
+    courses=c("食在拉丁美洲")
+  )
+)
+print(`小明108學年課表C`)
+```
+```{r}
+commit <- list(
+  author=list("Martin老師","pu.edu.twmtlin@gm.nt",
+              ymd_hms("2020-03-25T07:17:40Z")),
+  committer=list("emilyluckey","emily007@gmail.com",
+              ymd_hms("2020-03-26T08:18:40Z")),
+  message="update"
+  
+)
+  print(commit)
+```
+```{r}
+library(jsonlite) # 不少同學這行會有Error，還記得如何排除嗎？
+toJSON(commit)
+```
+```{r}
+temperature <- list(
+ day=c(ymd("2020-03-31"),ymd("2020-04-01")),
+ city1=list("台北市",highest=c(25),lowest=c(18)),
+ city2=list("新北市",highest=c(24),lowest=c(15))
+ )
+print(temperature)
+```
+##3.7
+```{r}
+save(commit,temperature,file = "0401.Rda")
+```
+
+```{r}
+load("0401.Rda")
+```
+

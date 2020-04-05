@@ -1,0 +1,4 @@
+"0","# list含兩個lists, 子層list又各含兩個vectors"
+"0","`小明108學年課表C` <- list("
+"2","Error: \uxxxx sequences not supported inside backticks (line 1)
+"
