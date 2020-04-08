@@ -285,7 +285,9 @@ print(`小明108學年課表B`)
   )
 )
 print(`小明108學年課表C`)
+Sys.setlocale()
 ```
+
 ```{r}
 commit <- list(
   author=list("Martin老師","pu.edu.twmtlin@gm.nt",

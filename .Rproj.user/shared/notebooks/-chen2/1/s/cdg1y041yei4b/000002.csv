@@ -1,0 +1,8 @@
+"0","library(jsonlite)"
+"0","fromJSON(""https://data.tainan.gov.tw/dataset/4cd9345a-04bf-4328-a97d-314ff78b4763/resource/afc025fc-1ef4-447c-b785-a680391d0ca1/download/tnsport2.json"", simplifyDataFrame = F) -> tainanSportsMap"
+"2","JSON string contains (illegal) UTF8 byte-order-mark!"
+"0","length(tainanSportsMap)"
+"1","[1]"
+"1"," 1076"
+"1","
+"

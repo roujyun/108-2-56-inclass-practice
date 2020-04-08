@@ -1,0 +1,195 @@
+---
+title: "roujyun"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+
+```{r}
+vectorExample <- c("小明","小英","大雄")
+
+# 有多少位置可選：
+length(vectorExample)
+```
+```{r}
+vectorExample[[1]]
+vectorExample[[3]]
+```
+```{r}
+library(jsonlite)
+fromJSON("https://data.tainan.gov.tw/dataset/4cd9345a-04bf-4328-a97d-314ff78b4763/resource/afc025fc-1ef4-447c-b785-a680391d0ca1/download/tnsport2.json", simplifyDataFrame = F) -> tainanSportsMap
+
+length(tainanSportsMap)
+```
+##用名字選$
+```{r}
+listExample <- 
+  list(
+    student="小明",
+    `學期`=list(
+      `108-1`=list(
+        list(
+          name="個體經濟學",
+          teacher="Alice",
+          grade=85
+        )
+      ),
+      `108-2`=list(
+        list(
+          name="總體經濟學",
+          teacher="Mark",
+          grade=78
+        )
+      )
+    )
+  )
+# 有多少位置可選：
+length(listExample)
+names(listExample)
+```
+```{r}
+listExample$student
+listExample$`學期` # 特殊命名依然要用反頓點呼叫
+```
+```{r}
+listExample[["student"]]
+listExample$student
+
+listExample[["學期"]] # 小心不是反頓點喔。
+listExample$`學期`
+```
+```{r}
+student <- "student"
+listExample[[student]]
+```
+新北市各區衛生所之門診時間及疫苗種類彙整表
+```{r}
+fromJSON("http://data.ntpc.gov.tw/api/v1/rest/datastore/382000000A-000157-002",
+         simplifyDataFrame = F) -> newTaipeiCityVaccine
+```
+```{r}
+names(newTaipeiCityVaccine)
+length(newTaipeiCityVaccine)
+str(newTaipeiCityVaccine)
+```
+```{r}
+str(newTaipeiCityVaccine[["success"]])
+str(newTaipeiCityVaccine[[1]])
+str(newTaipeiCityVaccine$success)
+```
+##選多個元素
+```{r}
+vectorExample
+vectorExample[c(1,3)]
+vectorExample[c(3,2,1)] # 產生重新排列效果
+```
+```{r}
+# 顯示到第一層
+str(listExample, max.level=1)
+
+str(listExample[c(1,2)], max.level=1)
+str(listExample[c(2,1)], max.level=1)
+```
+```{r}
+# 顯示到第一層
+str(listExample, max.level=1)
+
+str(listExample[["學期"]])
+listExample[["學期"]]
+listExample[c("student","學期")]
+```
+臺北市夜市資料
+```{r}
+fromJSON("https://www.dropbox.com/s/qnm9bnz7vccrvcz/taipeiNightMarkets.json?dl=1", simplifyDataFrame = F) -> taipeiNightMarkets
+```
+
+```{r}
+vectorExample
+vectorExample[c(T,T,F)] # 要，要，不要
+```
+```{r}
+names(taipeiNightMarkets)
+```
+```{r}
+c(T,F,F,F,T,F,F,F,F,T,F,F,F,T) -> selectedmarket
+taipeiNightMarkets[selectedmarket]
+
+str(taipeiNightMarkets[c(T,F,F,F,T,F,F,F,F,T,F,F,F,T)], max.level=1)
+```
+```{r}
+selectedmarket <- rep(F,14)
+print(selectedmarket)
+selectedmarket[c(1,5,10,14)] <- TRUE
+selectedmarket
+```
+```{r}
+str(taipeiNightMarkets[selectedmarket], max.level=1)
+```
+```{r}
+get1 <- listExample[["學期"]]
+get2 <- listExample["學期"]
+```
+```{r}
+#get1 # 學期拿出來，有3個元素的list
+str(get1,max.level = 1)
+```
+```{r}
+str(get2,max.level = 1)
+```
+##連鎖選取
+```{r}
+numVector <- c(2,3,6,-1,4,2,6)
+select1 <- numVector[c(1,4)]; select1
+select2 <- select1[[1]]; select2
+
+# 相當於
+numVector[c(1,4)][[1]]
+```
+```{r}
+select1 <- numVector[c(T,T,F,T,F,F,T)]; select1
+select2 <- select1[c(1,4)]; select2
+
+# 相當於
+numVector[c(T,T,F,T,F,F,T)][c(1,4)]
+```
+```{r}
+majors <- c("經濟學系","經濟學系","社會學系","社工系","經濟學系")
+names <- c("小英", "小美", "大雄","阿華", "阿尼")
+gender <- c("F","F","M","F","M")
+```
+```{r}
+econonly <- majors[c(T,T,F,F,T)];econonly
+names[econonly];gender[econonly]
+ecofemaleonly <- gender[c(1,2)];ecofemaleonly
+names[econonly][c(1,2)]
+```
+
+
+
+
+
