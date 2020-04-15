@@ -1,0 +1,7 @@
+"0","# sum_fiveReceipts"
+"0","sum_fiveReceipts <- sum(as.integer(levels_fiveReceipts))"
+"0","sum_fiveReceipts"
+"1","[1]"
+"1"," 55"
+"1","
+"

@@ -1,0 +1,6 @@
+"0","plot(pressure)"
+"2","unable to open file 'C:/Users/yz285/OneDrive/??/GitHub/108-2-56-inclass-practice/.Rproj.user/shared/notebooks/-chen2/1/65C38030F6ED14AB/czsrj60cups7w_t/_rs_chunk_plot_001.png' for writing"
+"2","opening device failed"
+"2","Error in (function (filename = ""Rplot%03d.png"", width = 480, height = 480,  : 
+  unable to start png() device
+"

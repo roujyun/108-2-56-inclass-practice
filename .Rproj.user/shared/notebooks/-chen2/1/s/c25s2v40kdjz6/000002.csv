@@ -1,0 +1,8 @@
+"0","get1 <- listExample[[""學期""]]"
+"0","get1$`108-1` -> get1_layer1"
+"0","get1_layer1[[1]] -> get1_layer2"
+"0","get1_layer2$teacher"
+"1","[1]"
+"1"," ""Alice"""
+"1","
+"

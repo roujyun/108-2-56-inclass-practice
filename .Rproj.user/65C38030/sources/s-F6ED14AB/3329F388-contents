@@ -1,0 +1,351 @@
+---
+title: "roujyun"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+
+```{r}
+vectorExample <- c("小明","小英","大雄")
+
+# 有多少位置可選：
+length(vectorExample)
+```
+```{r}
+vectorExample[[1]]
+vectorExample[[3]]
+```
+```{r}
+library(jsonlite)
+fromJSON("https://data.tainan.gov.tw/dataset/4cd9345a-04bf-4328-a97d-314ff78b4763/resource/afc025fc-1ef4-447c-b785-a680391d0ca1/download/tnsport2.json", simplifyDataFrame = F) -> tainanSportsMap
+
+length(tainanSportsMap)
+```
+##用名字選$
+```{r}
+listExample <- 
+  list(
+    student="小明",
+    `學期`=list(
+      `108-1`=list(
+        list(
+          name="個體經濟學",
+          teacher="Alice",
+          grade=85
+        )
+      ),
+      `108-2`=list(
+        list(
+          name="總體經濟學",
+          teacher="Mark",
+          grade=78
+        )
+      )
+    )
+  )
+# 有多少位置可選：
+length(listExample)
+names(listExample)
+str(listExample)
+```
+```{r}
+listExample$student
+listExample$`學期` # 特殊命名依然要用反頓點呼叫
+```
+```{r}
+listExample[["student"]]
+listExample$student
+
+listExample[["學期"]] # 小心不是反頓點喔。
+listExample$`學期`
+```
+```{r}
+student <- "student"
+listExample[[student]]
+```
+新北市各區衛生所之門診時間及疫苗種類彙整表
+```{r}
+fromJSON("http://data.ntpc.gov.tw/api/v1/rest/datastore/382000000A-000157-002",
+         simplifyDataFrame = F) -> newTaipeiCityVaccine
+```
+```{r}
+names(newTaipeiCityVaccine)
+length(newTaipeiCityVaccine)
+str(newTaipeiCityVaccine)
+```
+```{r}
+str(newTaipeiCityVaccine[["success"]])
+str(newTaipeiCityVaccine[[1]])
+str(newTaipeiCityVaccine$success)
+```
+##選多個元素
+```{r}
+vectorExample
+vectorExample[c(1,3)]
+vectorExample[c(3,2,1)] # 產生重新排列效果
+```
+```{r}
+# 顯示到第一層
+str(listExample, max.level=1)
+
+str(listExample[c(1,2)], max.level=1)
+str(listExample[c(2,1)], max.level=1)
+```
+```{r}
+# 顯示到第一層
+str(listExample, max.level=1)
+
+str(listExample[["學期"]])
+listExample[["學期"]]
+listExample[c("student","學期")]
+```
+臺北市夜市資料
+```{r}
+fromJSON("https://www.dropbox.com/s/qnm9bnz7vccrvcz/taipeiNightMarkets.json?dl=1", simplifyDataFrame = F) -> taipeiNightMarkets
+```
+
+```{r}
+vectorExample
+vectorExample[c(T,T,F)] # 要，要，不要
+```
+```{r}
+names(taipeiNightMarkets)
+```
+```{r}
+c(T,F,F,F,T,F,F,F,F,T,F,F,F,T) -> selectedmarket
+taipeiNightMarkets[selectedmarket]
+
+str(taipeiNightMarkets[c(T,F,F,F,T,F,F,F,F,T,F,F,F,T)], max.level=1)
+```
+```{r}
+selectedmarket <- rep(F,14)
+print(selectedmarket)
+selectedmarket[c(1,5,10,14)] <- TRUE
+selectedmarket
+```
+```{r}
+str(taipeiNightMarkets[selectedmarket], max.level=1)
+```
+```{r}
+get1 <- listExample[["學期"]]
+get2 <- listExample["學期"]
+```
+```{r}
+#get1 # 學期拿出來，有3個元素的list
+str(get1,max.level = 1)
+```
+```{r}
+str(get2,max.level = 1)
+```
+##連鎖選取
+```{r}
+numVector <- c(2,3,6,-1,4,2,6)
+select1 <- numVector[c(1,4)]; select1
+select2 <- select1[[1]]; select2
+
+# 相當於
+numVector[c(1,4)][[1]]
+```
+```{r}
+select1 <- numVector[c(T,T,F,T,F,F,T)]; select1
+select2 <- select1[c(1,4)]; select2
+
+# 相當於
+numVector[c(T,T,F,T,F,F,T)][c(1,4)]
+```
+```{r}
+majors <- c("經濟學系","經濟學系","社會學系","社工系","經濟學系")
+names <- c("小英", "小美", "大雄","阿華", "阿尼")
+gender <- c("F","F","M","F","M")
+```
+```{r}
+econonly <- majors[c(T,T,F,F,T)];econonly
+names[econonly];gender[econonly]
+ecofemaleonly <- gender[c(1,2)]
+names[econonly][c(1,2)]
+```
+##get1
+```{r}
+get1 <- listExample[["學期"]]
+get2 <- listExample["學期"]
+```
+```{r}
+get1$`108-1` -> get1_layer1
+str(get1_layer1)
+```
+```{r}
+get1_layer1[[1]] -> get1_layer2
+str(get1_layer2)
+```
+```{r}
+get1_layer2$teacher
+```
+```{r}
+get1$`108-1`[[1]]$teacher
+```
+```{r}
+get1 <- listExample[["學期"]]
+get1$`108-1` -> get1_layer1
+get1_layer1[[1]] -> get1_layer2
+get1_layer2$teacher
+```
+##get2
+```{r}
+get2 <- listExample["學期"]
+get2_layer1 <- get2[[1]]
+get2_layer2 <- get2_layer1$`108-1`
+get2_layer3 <- get2_layer2[[1]]
+get2_layer3$teacher
+
+get2[[1]]$`108-1`[[1]]$teacher
+get2[["學期"]]$`108-1`[[1]]$teacher
+```
+##list應用
+```{r}
+vector1 <- c(a=1,b=3,c=4)
+vector1[["a"]]
+vector1[c("a","c")]
+vector1$a #vector 不能用$
+
+list1 <- list1(a=1,b=3,c=4)
+list1[["a"]]
+list1[c("a","c")]
+list1$a
+```
+```{r}
+today <- list(
+  list("台北市",c(highest_temp = 25),c(lowest_temp = 18)),
+  list("新北市",c(highest_temp = 24),c(lowest_temp = 15)))
+str(today)
+```
+```{r}
+today[[1]][[2]]
+```
+```{r}
+tomorrow <- list(
+  list("台北市",c(highest_temp = 25),c(lowest_temp = 18)),
+  list("新北市",c(highest_temp = 24),c(lowest_temp = 15)))
+
+weather <- list(today,tomorrow)
+
+str(weather)
+```
+```{r}
+today <- list(
+  list("台北市",highest_temp=c(highest_temp =          25),lowest_temp=c(lowest_temp = 18)),
+  list("新北市",highest_temp=c(highest_temp = 24),lowest_temp=c(lowest_temp = 15)))
+tomorrow <- list(
+  list("台北市",highest_temp=c(highest_temp = 25),lowest_temp=c(lowest_temp = 18)),
+  list("新北市",highest_temp=c(highest_temp = 24),lowest_temp=c(lowest_temp = 15)))
+weather <- list(today,tomorrow)
+
+str(weather)
+
+
+weather[[1]][[2]]$highest_temp # 今天/新北市/highest_temp
+weather[[2]][[2]]$highest_temp # 明天/新北市/highest_temp
+```
+```{r}
+a <- c("1","b","TRUE")
+a
+a[[2]] <- "c" # 元素存在: 替換
+a[[4]] <- "7" # 元素不存在： 增加
+a[c(5,6)] <- c("J", "K")
+a
+```
+```{r}
+a[[7]] <- "Mary"
+
+
+a <- c(a,c("Rona"))
+a
+
+```
+
+
+
+```{r}
+library(lubridate)
+list1 <- 
+  list(
+    list(
+      name="Jack",
+      birthday=ymd("1998-03-21"),
+      status=c(height=177, weight=80)
+    )
+  )
+
+str(list1)
+```
+```{r}
+# 更改日期
+list1[[1]]$birthday <- ymd("1997-03-21")
+
+# 新增資料
+list1[[2]] <- list(
+  name="Mary",
+  birthday=ymd("1998-08-24")
+)
+
+str(list1)
+```
+```{r}
+list1[[2]][[3]] <- c(status=c(hight=163,weight=45))
+list1[[1]]$status[["height"]] <- 176
+
+str(list1)
+```
+```{r}
+list1[[1]][c("bloodType","registered")] <- list("AB",TRUE)
+
+str(list1)
+```
+```{r}
+a[-c(1,3)]
+a[c(-2)]
+
+print(a)
+a[-c(1,3)] -> a # 要回存才算真的刪除
+```
+```{r}
+list1[[1]][-3] -> list1[[1]] # 小心回存的位置
+
+list1[[2]][-c(4,5)] -> list1[[2]]
+str(list1)
+```
+```{r}
+str(list1)
+list1[[2]][c(1,2)] <- NULL
+str(list1)
+```
+
+
+
+
+
+
