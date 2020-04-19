@@ -182,13 +182,27 @@ numVector[c(T,T,F,T,F,F,T)][c(1,4)]
 majors <- c("經濟學系","經濟學系","社會學系","社工系","經濟學系")
 names <- c("小英", "小美", "大雄","阿華", "阿尼")
 gender <- c("F","F","M","F","M")
+
+majors[c(T,T,F,F,T)] -> econOnly
+c(T,T,F,F,T) -> eco
+names[eco]
+gender[eco]
+gender[eco][c(1,2)]-> econFemaleOnly
+names[eco][c(1,2)]
 ```
 ```{r}
-econonly <- majors[c(T,T,F,F,T)];econonly
-names[econonly];gender[econonly]
-ecofemaleonly <- gender[c(1,2)]
-names[econonly][c(1,2)]
+ajors <- c("經濟學系","經濟學系","社會學系","社工系","經濟學系")
+names <- c("小英", "小美", "大雄","阿華", "阿尼")
+gender <- c("F","F","M","F","M")
+
+econOnly<-c(T,T,F,F,T)
+names[econOnly]
+gender[econOnly]
+econFemaleOnly<-gender[econOnly][c(1,2)]
+names[c(econOnly)][c(1,2)]
 ```
+
+
 ##get1
 ```{r}
 get1 <- listExample[["學期"]]
@@ -351,6 +365,50 @@ fromJSON("https://data.ntpc.gov.tw/od/data/api/54DDDC93-589C-4858-9C95-18B2046CC
 newTaipeiYouBike[[2]][c(1,2,3)] <- NULL
 str(newTaipeiYouBike[[2]])
 ```
+
+##考前複習
+```{r}
+my_108_total_credits <- 15
+_108_total_credits <- 15
+108_total_credits <- 15
+_my_108_total_credits <- 15
+my.108.total_credits <- 15
+.108.total_credits <- 15 # 隱藏變數
+.my.108.total_credits <- 15
+我的108學年總學分數 <- 15
+`我的108學年總學分數` <- 15 # 特殊名稱處理，`不是名稱的一部份
+`.108.total_credits` <- 15
+```
+```{r}
+logi1 <- c(T,TRUE,F,FALSE,FALSE)
+logi1
+```
+```{r}
+# 10位學生的主系
+majors10_char <- c('經濟學系','社會學系','社會學系','經濟學系','經濟學系','社會學系','經濟學系','經濟學系','經濟學系','社會學系')
+
+typeof(majors10_char)
+class(majors10_char)
+```
+```{r}
+majors10_factor <- factor(majors10_char)
+# 或
+majors10_factor <- factor(
+  c('經濟學系','社會學系','社會學系','經濟學系','經濟學系','社會學系','經濟學系','經濟學系','經濟學系','社會學系')
+)
+
+typeof(majors10_factor)
+class(majors10_factor)
+```
+```{r}
+as.integer(majors10_factor) 
+levels(majors10_factor)
+```
+```{r}
+char3 <- c("小明","1","3")
+as.integer(char3)
+```
+
 
 
 

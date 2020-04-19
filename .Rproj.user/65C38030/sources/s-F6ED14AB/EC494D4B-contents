@@ -197,6 +197,7 @@ tpeDatetime
 class(tpeDatetime)
 typeof(tpeDatetime)
 as.double(tpeDatetime)
+as.numeric(tpeDatetime)
 ```
 葡萄牙 Mar.18, 2020, 05:52:40
 ```{r}
