@@ -1,0 +1,173 @@
+---
+title: "第一次期中考"
+output: html_document
+params:
+  studentName: "陳柔均"
+  studentID: "410873119"
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+
+  2. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 滿分100，每題配分相同
+
+> 前述存檔與frontmatter要求缺任何一個則扣5分。
+
+> 請於時間結束前上傳，最好提早一、二分鐘以免最後遲交。
+
+！！！！！遲交一律0分！！！！
+
+請先執以下code chunk, 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(jsonlite); library(lubridate); library(readr)
+```
+
+# 題目
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+
+
+## 1 查帳
+來自印度的Banerjee在飛鳶大學特區開了一間正宗印度茶飲，由於生意太好引來國稅局查帳。國稅局菜鳥小芃拿到300張飲料收據receipts300，一看嚇死人——全都是用印度Gujarati語記帳。請執行以下程式取得這300張收據：
+
+```{r data1}
+source("https://www.dropbox.com/s/tv16xt8mv11cli7/gujarati.R?dl=1")
+print(receipts300[1:30]) # 印前30張
+```
+每張收據杯數均在1-9，Gujarati語的1-9則分別如numerals_Gujarati第1到第9元素值所示：
+```{r}
+print(numerals_Gujarati)
+```
+請求出這300張收據的總杯數並存在sum300這個答案物件：
+```{r ans1}
+# sum300
+levels(receipts300[1:300]) <- c(1,2,3,4,5,6,7,8,9)
+num_receipts300<-factor(receipts300[1:300])
+new_receipts300<-as.numeric(num_receipts300)
+sum(new_receipts300[1:300])
+```
+
+
+## 2 宋代詩詞
+請執行以下程式得到宋代詩詞物件poem_song，只有一首詩的物件poem_new，及一個integer class的poem_songOrder。
+```{r data2}
+library(jsonlite); library(readr)
+fromJSON("https://www.dropbox.com/s/b59ye5qoxnwhzu9/poem_song.json?dl=1", simplifyDataFrame = F) -> poem_song
+fromJSON("https://www.dropbox.com/s/mjvaqdu4gufblag/poem_new.json?dl=1", simplifyDataFrame = F) -> poem_new
+read.csv("https://www.dropbox.com/s/oyzvb3d05igb05e/poem_songOrder.csv?dl=1")$x -> poem_songOrder
+```
+
+
+### 2.1 更改排序
+原本poem_song的資料順序亂了，相同作者的作品沒有形成緊連的順序，好險正確順序記錄在poem_songOrder裡。poem_songOrder第i個元素值（假設為k）代表poem_song第i個元素值應該要放poem_song第k個元素值才對，依此類推。請將poem_song調成正確排序。
+
+```{r ans21}
+# poem_song
+poem_songOrder 
+```
+
+### 2.2 增加元素
+請將poem_new的內容新增到poem_song的最後，但維持和poem_song其他元素一樣的元素名稱及結構。
+```{r ans22}
+# poem_song
+poem_song[[136]] <- list(poem_new)
+str(poem_new)
+```
+
+
+### 2.3 修改
+poem_song第22首詩的原文應為：
+
+斗柄仙城曉，龍鱗下隰通。 三竿眺羲馭，十里過商中。 水藉天容碧，塵依驛轍紅。 喜聞何力語，應爲樂秋豐。
+
+然而當時助理一邊瀏覽百貨公司週年慶消息一邊打字而產生錯誤，請修正它。(第22首詩的位置不受2.1題排序改變影響，請放心作答)
+```{r ans23}
+# poem_song
+poem_song[[22]][[2]] <- "斗柄仙城曉，龍鱗下隰通。 三竿眺羲馭，十里過商中。 水藉天容碧，塵依驛轍紅。 喜聞何力語，應爲樂秋豐。"
+str(poem_song[[22]])
+```
+## 3 Dcard
+
+此大題引入的資訊在改題時會隨機更換元素值，故答案如用到裡頭元素值，請將它確實取出再進行題目所要變化，切勿自己手動輸入值而跳過元素粹取步驟。
+
+### 3.1 網路爬蟲
+R裡面常用的網路爬蟲套件之一是rvest, 請寫下如何安裝rvest:
+```{r ans31c}
+install.packages("rvest")
+```
+
+***
+以下各題都是就同一個物件接連的做變化，故答案物件都是同一個（叫post）。
+
+### 3.2 設定class
+請執行以下程式引入這題所要文章資訊：
+```{r data32}
+source("https://www.dropbox.com/s/6pzodo4967mc9g4/dcardPost.R?dl=1")
+```
+post來自https://www.dcard.tw/f/ntpu/p/233512569 ，請將回文資訊（comments）裡的gender, hearts轉成合理的class
+```{r ans32}
+# post
+post$comments$gender <- as.character(post$comments$gender)
+post$comments$hearts <- as.integer(post$comments$hearts)
+post$comments$gender
+post$comments$hearts
+```
+
+### 3.3 DateTime
+很多時候我們需要將多個字串接成一個，這時paste0是個好用的函數，例如：
+```{r}
+a <- "我叫"
+b <- c("小明","阿美")
+paste0(a,b)
+```
+請將回文資訊裡的DateTime轉成合理的POSIXct/POSITt class，注意dcard顯示的都是台灣的時間。
+```{r ans33}
+# post
+ymd_hms(tz="Asia/Taipei") -> a
+c(post$comments$DateTime) -> b
+paste0(a,b)
+```
+
+### 3.4 DateTime
+延續上一題結果，遠在波蘭留學的Alex (男)，在此文下加了一則評論，內容是：
+
+"心不在課堂上，在哪都做得到遠距。"
+
+此則文章是波蘭華沙（Poland, Warsaw）時間4月25日下午3點50分發的。請依照comments裡的25則記錄方式加上這第26則，hearts數字填0，要注意時間格式要與前25則相同以台灣時間顯示。
+```{r ans34}
+# post
+post$comments$content[[26]] = "心不在課堂上，在哪都做得到遠距。"
+po
+with_tz("4月25日下午3點50分",tzone="Europe/Poland")
+
+```
+
+
+### 3.5 變化結構
+接前一題。請取出發文者的category_DateTime，將category與dateTime切開記錄，使得post第一層元素的結構為: 
+```
+List of 6
+ $ title           : chr "對學校的遠距教學措施....  
+ $ content         : chr "從一開始的遠距教學測試，就已經落後...   
+ $ submitter_gender: chr "男"
+ $ category        : chr "臺北大學"
+ $ dateTime        : POSIXct[1:1], format: "2020-04-20 14:44:00"
+ $ comments        :List of 4
+````
+此題答案元素名稱出現順序也要對。
+
+```{r ans35}
+# post
+```
+
+
+# 恭喜你寫完了!最後記得回去檢查注意事項有沒有都做到，避免被白扣分喔~
