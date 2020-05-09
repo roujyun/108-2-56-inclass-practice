@@ -1,0 +1,176 @@
+---
+title: "homework 3"
+output: html_document
+params:
+  studentName: "陳柔均"
+  studentID: "410873119"
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+
+  2. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 每次作業滿分10分：有寫作業於期限內上傳得3分，剩餘7分依作業準確率決定最後得分多寡，除非該題另有規定。
+
+> 前述存檔與frontmatter要求缺任何一個則扣1分。
+
+請先執以下code chunk, 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(jsonlite); library(lubridate); library(readr); library(stringr)
+```
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+```{r}
+library(lubridate)
+```
+
+# 題目
+
+## 1 新北市違法雇主
+以下資料來自[新北市違法雇主資料_勞動基準法](https://data.ntpc.gov.tw/od/detail?oid=A3408B16-7B28-4FA5-9834-D147AAE909BF)，執行後可得到badEmployers物件，其底下元素名稱說明可參考來源連結網頁：
+```{r data1}
+fromJSON("https://data.ntpc.gov.tw/od/data/api/CB6C96C8-D514-42EA-8591-0F4447E79C91?$format=json") -> badEmployers
+```
+
+
+### 1.1 違反法條種類
+針對law元素，列出裡面出現過的條款（不重覆陳列）存在violatedArticles (class character)：
+```{r ans11}
+# violatedArticles
+violatedArticles <- levels(factor(badEmployers$law))
+as.character(violatedArticles)
+violatedArticles
+
+```
+
+### 1.2 各項法條違反者數目
+使用table()函數呈現出每個條款的違法廠商數目，存在table_countsByArticle (class table), 正確答案在執行names(table_countsByArticle)時會出現前一題的所有條款。
+```{r ans12}
+# table_countsByArticle
+table_countsByArticle <- table( badEmployers$law)
+names(table_countsByArticle)
+table_countsByArticle
+```
+
+### 1.3 違反數最多的法條
+自1.2題的table_countsByAricle找出最多廠商違反的條款名稱及數目，即透過「要/不要」向量選出違反數最高的項目；結果存在mostViolatedArticle（class integer）。正確答案下，names(mostViolatedArticle)會呈現該條款，而as.integer(mostViolatedArticle)會呈現違法廠商數目。
+
+提示：table class物件為integer type，可對它取max()得到最大值。
+```{r ans13}
+# mostViolatedArticle
+pick_mostViolatedArticle<- table_countsByArticle>=max(table_countsByArticle)
+mostViolatedArticle <- table_countsByArticle[pick_mostViolatedArticle]
+names(mostViolatedArticle)
+as.integer(mostViolatedArticle)
+```
+
+
+### 1.4 最常違反法條之內容
+找出最常違反條款的法條內容（可參見lawContent這個元素），並將此內容存在mostViolatedArticle_content (class character, length=1)
+```{r ans14}
+# mostViolatedArticle_content
+pick_mostViolatedArticle_content <-  table(badEmployers$lawContent) >=max(table(badEmployers$lawContent))
+mostViolatedArticle_content <-
+table(badEmployers$lawContent)[pick_mostViolatedArticle_content]
+as.character(mostViolatedArticle_content)
+names(mostViolatedArticle_content)
+```
+
+
+### 1.5 處份日期最常落在幾月
+找出處份日期最常出現的月份並存在popularSentenceMonth（class character, length=1）：
+```{r ans15}
+# popularSentenceMonth
+pick_popularSentenceMonth <- table(badEmployers$dt)>=max(table(badEmployers$dt))
+popularSentenceMonth<-table(badEmployers$dt)[pick_popularSentenceMonth]
+as.character(popularSentenceMonth)
+popularSentenceMonth
+```
+
+## 2 個人申請
+以下資料為某年度學測五科分數對照表(table)、北大經濟虛擬榜單(namelist)以及喵喵高中3年1班10位同學的個人申請資料(students10)：
+```{r data2}
+read_csv("https://www.dropbox.com/s/xjzg1iuuws7tcha/table.csv?dl=1") -> table
+source("https://www.dropbox.com/s/5oy56om4q0857tt/student10.R?dl=1",encoding = "UTF-8")
+```
+
+
+### 2.1 ordered factor
+請將國文的級分對照表按照分數區間轉化為factor後存到名為chinese的答案物件(class為Ord.factor)，為了方便計算，請讓每一個分數區間的儲存方式=級分+1:
+
+提示:
+"76.59 - 100.00"為16
+"71.12 -  76.58"為15
+.
+.
+.
+以此類推。
+
+小知識:
+factor是從1開始的整數，沒有0喔。
+```{r ans21}
+# chinese
+table$`國文` <- ordered(table$`國文`)
+table$`國文` <- factor(table$`國文`,
+  levels=(1:16),
+  ordered = T)
+chinese <- table$`國文`
+chinese
+```
+
+
+### 2.2 str_detect()
+請取出10位學生中志願為北大的學生名字並存到名為ntpu_namelist的答案物件(class為chr):
+```{r ans22}
+# ntpu_namelist
+print(students10[c("姓名","志願")])
+pick_ntpu <- str_detect(students10$`志願`,"北大")
+ntpu_namelist <- students10$`姓名`[pick_ntpu]
+ntpu_namelist
+```
+
+### 2.3 vector計算&logical應用練習
+以下為北大經濟該年度一階篩選條件:
+
+篩選一: 國文 >= 12
+篩選二: 英文+數學 >= 26
+
+請問取出能進入北大經濟二階面試的學生名單，並存到名為ntpu_eco的答案物件(class為chr):
+
+提示：
+志願沒有填北大經濟的人可以進一階篩選嗎?
+logical儲存的本質是甚麼?
+```{r ans23}
+# tpu_econtpu_eco
+pick_chineses <- students10$`國文` >= 12
+pick_MathEnglish <- (students10$`數學` + students10$`英文`) >=26
+pick_ntpu_eco <- stringr::str_detect(students10$`志願`,"北大經濟")
+ntpu_eco <- students10$`姓名`[pick_chineses][pick_MathEnglish][pick_ntpu_eco]
+ntpu_eco
+```
+
+
+### 2.4 %in%
+終於放榜了!
+請幫3年1班志願填北大經濟的同學看看他們有沒有上榜，並幫上榜同學列印榜單，以下為榜單模板:
+
+恭喜 XXX 同學錄取國立臺北大學經濟系
+
+請將榜單文字儲存到名為congrats的答案物件(class為chr)。
+```{r ans24}
+# congrats
+pick <- students10$`姓名` %in% namelist[ntpu_eco]
+congrats <- "恭喜陳依祈,林溺 同學錄取國立臺北大學經濟系"
+congrats
+```
+
+
+
