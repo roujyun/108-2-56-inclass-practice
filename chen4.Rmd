@@ -1,0 +1,266 @@
+---
+title: "chen4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+
+
+```{r}
+char1 <- c("Wild","Apple","Donald","May","Avocada") 
+factor1 <- factor(char1)
+levels(factor1)
+```
+```{r}
+library(stringr)
+char2 <- c("蔡英文","習近平","Donald Trump","蔡頭") 
+factor2 <- factor(char2)
+levels(factor2)
+
+sort(
+  str_sub(char2,1,1)
+)
+sort(
+  str_sub(char2,2,2)
+)
+```
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "English")
+Sys.getlocale("LC_COLLATE")
+```
+```{r}
+jsonlite::fromJSON("https://od.cdc.gov.tw/eic/Day_Confirmation_Age_County_Gender_19CoV.json") -> covid19
+```
+```{r}
+# 不可排序類別：性別、縣市、是否境外移入
+covid19$`縣市` <- 
+  factor(covid19$`縣市`)
+covid19$`性別` <-
+  factor(covid19$`性別`)
+covid19$`是否為境外移入` <-
+  factor(
+    covid19$`是否為境外移入`
+  )
+```
+```{r}
+# 可排序類別資料：年齡層
+covid19$`年齡層` <-
+  factor(
+    covid19$`年齡層`,
+    ordered=TRUE
+  )
+```
+```{r}
+levels(covid19$`縣市`)
+levels(covid19$`性別`)
+levels(covid19$`是否為境外移入`)
+```
+```{r}
+levels(covid19$`年齡層`)
+```
+```{r}
+levels(covid19$`性別`)
+covid19$`性別` <- factor(covid19$`性別`, c("男","女"))
+```
+```{r}
+jsonlite::fromJSON(
+  "https://www.dropbox.com/s/jckqryeh5zeat5w/regionPopulation.json?dl=1"
+) -> population
+unlist(population) -> population
+```
+```{r}
+print(population)
+class(population) # 判斷出是named integer vector
+names(population) # 元素名稱是台灣各縣市
+```
+```{r}
+levels(covid19$`縣市`) # 是名稱字串向量
+
+# 由於population元素值有names，可以用`[名稱字串向量]`取出所要的
+levels(covid19$`縣市`) -> levelsInData
+population[levelsInData] -> population
+```
+```{r}
+population <- sort(population, decreasing=T)
+population
+```
+```{r}
+newLevels <- names(population)
+newLevels
+```
+```{r}
+covid19$`縣市` <-
+  factor(
+    covid19$`縣市`, levels=newLevels
+  )
+
+levels(covid19$`縣市`)
+```
+```{r}
+levels(covid19$`年齡層`)
+```
+```{r}
+level_names <- levels(covid19$`年齡層`)
+startingAges <- stringr::str_extract(
+  level_names,
+  "^[0-9]+" # regex：開頭的一串數字
+)
+print(startingAges)
+```
+```{r}
+# 要numerical class排的才一定對
+startingAges <- as.integer(startingAges)
+names(startingAges) <- level_names
+level_names
+```
+```{r}
+sort(startingAges) -> startingAges
+startingAges
+```
+```{r}
+covid19$`年齡層` <- 
+  factor(
+    covid19$`年齡層`, names(startingAges)
+  )
+levels(covid19$`年齡層`)
+```
+```{r}
+factor1 <- factor(
+  c("A","A","C","A","D","F","D","D")
+)
+levels(factor1)
+
+levels(factor1) <- c("優","佳","尚可","普")
+
+factor1
+```
+```{r}
+levels(factor1)[[1]] <- "Excellent"
+levels(factor1)[c(3,4)] <- c("C","D")
+factor1
+```
+```{r}
+factor1 <- factor(c("新北市","台北市","台中市","彰化市","基隆市","苗栗縣","苗栗縣"))
+factor1
+```
+```{r}
+levels(factor1) <- c("中部","北部","北部","中部","北部","中部")
+factor1
+```
+```{r}
+factor1 <- factor(c("0-4歲","5-9歲","10歲以上","0-4歲","5-9歲","5-9歲","10歲以上"))
+factor1
+```
+```{r}
+levels(factor1) <- c("0-9歲","10歲以上","0-9歲")
+factor1
+```
+```{r}
+covid19$`地區` <- covid19$`縣市`
+levels(covid19$`地區`)
+currentLevels <- levels(covid19$`地區`)
+
+# 整併
+north_regex <- "宜蘭縣|基隆市|[台臺]北市|新北市|桃園市|新竹市|新竹縣"
+middle_regex <- "苗栗縣|[台臺]中市|彰化縣|南投縣|雲林縣"
+south_regex <-
+  "嘉義市|嘉義縣|[台臺]南[縣市]|高雄市|屏東縣|澎湖縣"
+east_regex <- "花蓮縣|台東縣"
+
+currentLevels <- str_replace(currentLevels, 
+            north_regex, "北部")
+currentLevels <- str_replace(currentLevels, 
+            middle_regex, "中部")
+currentLevels <- str_replace(currentLevels, 
+            south_regex, "南部")
+newLevels <- str_replace(currentLevels, 
+            east_regex, "東部")
+
+
+levels(covid19$`地區`) <- newLevels
+covid19$`地區`
+```
+```{r}
+levels(covid19$`年齡層`)
+
+# 創造10歲間距的所有可能
+start <- seq(5, 55, by=10) # 由5到55，每個值差10的數值向量
+end <- seq(14, 64, by=10)
+middleLevels <- 
+  rep(
+    paste0(start,"-",end), 
+    each=2) # 每個新間距要2個
+newLevels <- c("4", middleLevels, "65+", "65+")
+
+levels(covid19$`年齡層`) <- newLevels
+levels(covid19$`年齡層`)
+```
+```{r}
+factor2 <- 
+  factor(c("好","好","普通","普通", "好"))
+levels(factor2)
+```
+```{r}
+factor2[[6]] <- "差"
+factor2 # 元素6變NA
+```
+```{r}
+factor2 <- 
+  factor(c("好","好","普通","普通", "好"))
+levels(factor2)
+
+# 先擴大levels
+levels(factor2) <- c(levels(factor2), "差")
+levels(factor2)
+factor2[[6]] <- "差"
+factor2
+
+levels(factor2)[[4]] <- "尚可"
+factor2[[7]] <- "尚可"
+levels(factor2)
+```
+```{r}
+# non factor
+char1 <- c("小明","小美")
+char2 <- c("大雄","技安")
+c(char1, char2)
+
+# factor
+factor1 <- factor(c("好", "壞", "壞"))
+factor2 <- factor(c("壞", "好", "好"))
+c(factor1, factor2)
+```
+```{r}
+factor1[4:6] <- factor2
+factor1
+```
+```{r}
+forcats::fct_c(factor1, factor2)
+```
+
+

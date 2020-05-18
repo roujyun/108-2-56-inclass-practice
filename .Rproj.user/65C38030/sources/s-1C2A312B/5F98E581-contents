@@ -1,0 +1,119 @@
+---
+title: "homework 4"
+output: html_document
+params:
+  studentName: "陳柔均"
+  studentID: "410873119"
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+
+  2. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 每次作業滿分10分：有寫作業於期限內上傳得3分，剩餘7分依作業準確率決定最後得分多寡，除非該題另有規定。
+
+> 前述存檔與frontmatter要求缺任何一個則扣1分。
+
+請先執以下code chunk, 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(jsonlite); library(lubridate); library(readr); library(stringr); 
+```
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "cht")
+```
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "English")
+```
+
+# 題目
+
+## 1. 兄/兄弟 
+小明想自twoNames中取出段兄及段兄弟兩個稱號，執行完以下結果他得到兩個「段兄」，第二個段兄應該要有弟：
+```{r data1}
+twoNames <- "有人叫他段兄，但也有有人叫他段兄弟，最常...."
+str_extract_all(twoNames, "段(兄|兄弟)")
+```
+請在小明的target regex後面加上「後面鄰居不能有弟」的regex描述並存在back_regex (class character) 裡. (hint: 查cheat sheet look around)
+```{r ans1}
+# back_regex
+"(?!弟)" -> back_regex
+back_regex
+```
+若你的答案正確，執行以下程式會得到一個段兄，一個段兄弟。
+```{r}
+pattern <- paste0("段(兄|兄弟)",back_regex)
+str_extract_all(twoNames, pattern)
+```
+
+## 2. 天龍八部
+執行以下程式會得到金庸小說《天龍八部》第一本書的資料semiGodsSemiDevils，透過`str()`你可以看到資料結構，其中data下面有section（回數）和text（內文）：
+```{r data2}
+jsonlite::fromJSON("https://www.dropbox.com/s/kv0xa0spa6q5l7q/semiGodsSemiDevils.json?dl=1") -> semiGodsSemiDevils
+```
+```{r}
+str(semiGodsSemiDevils)
+```
+
+### 2.1
+取出回數為"P2"的內文存在context_picked (class character). 
+```{r ans21}
+# context_picked
+context_picked <- semiGodsSemiDevils[[5]][[1]][[2]][[3]]
+context_picked
+```
+
+### 2.2
+context_picked把內文存在一個字串元素裡（很大的一串字串）。每段其實有「兩個空格」區隔如下所示：
+```{r}
+textExample <- c("段1......。　　段2....。")
+```
+`str_split(string, pattern)`可以將文字string依pattern找到的字組切割，切割後會形成一個list。請依「兩個空格」來切割context_picked並存在context_picked_split (class list)。（註：regex的一個空格是"\\s"）
+
+hint: str(context_picked_split) 會長得像
+```
+List of 1
+ $ : chr [1:214] "第一回　青衫磊落險峯行" "青光閃動，一柄青鋼劍倏地刺出，指向中年漢子左肩，使劍少年不等劍招用老，腕抖劍斜，劍鋒已削向那漢子右頸。那中年漢"| 
+```
+
+```{r ans22}
+# context_picked_split
+context_picked_split <- str_split(context_picked,"[\\s][\\s]")
+str(context_picked_split)
+```
+
+### 2.3
+段譽在內文被以"段譽、段兄、段兄弟、段大哥、段相公、段君，及姓段的小子"稱呼過，請使用`mention_duan`粹取出context_picked_split底下各段中段譽被提到的所有稱呼, 並存在mention_duan （class list, of 214 elements）裡。（小心context_picked_split要進下一層才會是各段的字串向量）
+
+可能有用的提示: 出現0或1次的複製次數是用?號接在文字的後面。
+
+```{r ans23}
+# mention_duan
+target_regex <- "段"
+A_regex <- "姓?"
+B_regex <- "[\u4E00-\u9FFF]+"
+regex_pattern <- glue::glue(
+  "(?<={A_regex}){target_regex}(?={B_regex})")
+
+mention_duan <- str_extract_all(context_picked_split[[1]],regex_pattern)
+str(mention_duan)
+mention_duan
+```
+
+### 2.4
+使用`unlist()`函數將mention_duan轉成字串後用`table()`函數統計段譽各稱號被提到的次數，並將table結果存在table_duan (class table)。
+```{r ans24}
+# table_duan
+table_duan <- table(unlist(mention_duan))
+
+table_duan
+```
+
+
+
