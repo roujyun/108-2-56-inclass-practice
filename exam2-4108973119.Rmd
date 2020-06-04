@@ -1,0 +1,221 @@
+---
+title: "第二次期中考"
+output: html_document
+params:
+  studentName: "陳柔均"
+  studentID: "410873119"
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+  
+  2. 接著File > Save As..., 然後檔名改成"原始檔名-學號", 如原始檔名為exam2, 學號為41078392，則新檔名為"exam2-41078392"
+
+  3. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 滿分100，每題配分相同
+
+> 前述存檔與frontmatter要求缺任何一個則扣5分。
+
+> 請於時間結束前上傳，最好提早一、二分鐘以免最後遲交。
+
+！！！！！遲交一律0分！！！！
+
+請先執行以下code chunk 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(jsonlite); library(lubridate); library(readr); library(stringr); library(purrr); library(magrittr)
+```
+
+## 1. 多重校名
+
+執行以下程序取得tpe_highSchools（不同學生畢業高中，同一所高中有多種別名）：
+```{r data1}
+source("https://www.dropbox.com/s/aow5y2772r8ratb/regexPatternCheck.R?dl=1", encoding = "UTF-8")
+jsonlite::fromJSON("https://www.dropbox.com/s/8wgdef4v44k1w0g/tpe_highSchools.json?dl=1") -> tpe_highSchools
+tpe_highSchools <- factor(tpe_highSchools)
+```
+
+### 1.1 類別排序
+請將tpe_highSchools的levels改成依以下次序排列：
+"臺北市立第一女中","台北市立第一女子高級中學","中山女中","中山女高", "台北市立中山女中", "臺北市立中山女子高級中學","國立政大附中", "國立政治大學附屬高級中學"
+```{r ans11}
+# tpe_highSchools
+levels(tpe_highSchools) <- c("臺北市立第一女中","台北市立第一女子高級中學","中山女中","中山女高", "台北市立中山女中", "臺北市立中山女子高級中學","國立政大附中", "國立政治大學附屬高級中學")
+levels(tpe_highSchools)
+```
+
+### 1.2 新增
+在tpe_highSchools裡新增10筆"北一女"（不可以用"臺北市立第一女中"或"臺北市立第一女子高級中學"別名來新增）
+
+```{r ans12}
+# tpe_highSchools
+str(tpe_highSchools)
+levels(tpe_highSchools)[[9]] <-"北一女"
+tpe_highSchools[680:689]<-"北一女"
+tpe_highSchools
+```
+
+### 1.3 北一女
+「北一女」代表臺北市立第一女中、臺北市立第一女子高級中學、北一女等同校別名。請完成可捕捉到所有北一女寫法的regex，但
+「臺、台、北、市、立、第、一、女、子、高、級、中、學」這13個字個別只能在regex出現「不超過一次」
+
+```{r ans13}
+# regex_hs1st
+regex_hs1st <- "[臺台]?北市?立?第?一女子?高?級?中?學?"
+regex_hs1st
+```
+
+完成後請執行以下程序，正確答案下：
+
+  * check_regexRestriction那行會使螢幕出現"Regex passes requirement."; 同時
+  
+  * levels(tpe_highSchools)所有北一女別名均被改成北一女。
+  
+```{r}
+check_regexRestriction("臺台北市立第一女子高級中學",regex_hs1st)
+currentLevels <- levels(tpe_highSchools)
+str_replace(currentLevels,regex_hs1st,"北一女") -> levels(tpe_highSchools)
+
+levels(tpe_highSchools)
+```
+
+### 1.4 高級中學
+請完成可捕捉到字尾「中、高、高級中學」的regex，但
+「高、級、中、學」這4個字個別只能在regex出現「不超過一次」
+```{r ans14}
+# regex_hsTitle
+regex_hsTitle <- "(高?級?中?學?)$"
+regex_hsTitle 
+```
+
+完成後請執行以下程序，正確答案下：
+
+  * check_regexRestriction那行會使螢幕出現"Regex passes requirement."; 同時
+  
+  * levels(tpe_highSchools)字尾的「中、高、高級中學」均被移除。
+
+```{r}
+check_regexRestriction("高級中學",regex_hsTitle)
+
+currentLevels <- levels(tpe_highSchools)
+str_remove(
+  currentLevels,regex_hsTitle
+) -> levels(tpe_highSchools)
+
+levels(tpe_highSchools)
+```
+
+## 2. 二二八事件
+
+執行以下程序取得[二二八事件人名索引](https://data.gov.tw/dataset/56237)物件data228:
+
+  * 程式會跑一會才能下載完畢，請耐心等候。
+  
+```{r data2}
+data228 <- readr::read_csv("https://www.dropbox.com/s/64yf3uq8wtvb5q7/%E4%BA%8C%E4%BA%8C%E5%85%AB%E4%BA%8B%E4%BB%B6%E4%BA%BA%E5%90%8D%E7%B4%A2%E5%BC%95.csv?dl=1")
+```
+
+data228有四個元素：
+
+  * 檔號
+  
+  * 全宗名：文件所屬單位
+  
+  * 個人名稱：與二二八事件有關人名
+  
+  * 附註：前述個人名稱的出處文件
+  
+  
+### 2.1 部門編號/年份
+「檔號」是由/符號區隔的4組代號組成，它的前兩部份分別代表「全宗名」及「檔案年份」，以第一筆資料"A803000000A/0036/340.2/5502.3"為例，A803000000A代表全宗名為國家安全局，檔案為民國36年資料。請在data228新增「全宗名編號」及「年」兩個元素：
+
+  * 全宗名編號：由檔號取出代表全宗名的編號。（class factor）
+  
+  * 年：由檔號取出的民國年份（class integer）
+  
+```{r ans21}
+# data228[c("全宗名編號","年")]
+
+`全宗名編號`<-str_extract(data228$`檔號`,"[:upper:][:graph:]+[:upper:](?=/)")
+`全宗名編號`<-factor(`全宗名編號`)
+ `年`<-str_extract(data228$`檔號`,"(?<=/)[:alnum:]{4}(?=/)")
+`年`<-as.integer(`年`)
+data228[["全宗名編號"]]<-`全宗名編號`
+data228[["年"]]<-`年`
+data228[c("全宗名編號","年")]
+```
+##str(data228)
+regex1 <- "[:alnum:]+(?=/)"
+pick1 <- str_extract(data228$`檔號`,regex1)
+regex2<-"(?<=/)[0-9]{4}(?=/)"
+pick2<-str_extract(data228$`檔號`,regex2)
+data228[[5]]<-list(`全宗名編號`=pick1)
+data228[[6]]<-list(`年`=pick2)
+data228[c("全宗名編號","年")]
+
+### 2.2 人犯名單
+「data228$附註」元素裡有個元素值為"表冊名稱:臺灣省二二八事變正法及死亡人犯名冊"，請依照以此表冊所屬「檔號」去找出與它有關的「個人名稱」將這些人名（不重覆的）存在victims物件裡（class character）
+
+```{r ans22}
+# victims
+pick_note<-data228$`檔號`[data228$`附註`=="表冊名稱:臺灣省二二八事變正法及死亡人犯名冊"]
+pick_name<-data228$`個人名稱`[data228$`檔號`==pick_note]
+victims<-levels(factor(pick_name))
+victims
+```
+
+### 2.3 重要人物
+計算前一小題人犯名單中每個人被多少檔案提及（以**檔號**種類來計算），答案存在documentCount_eachVictim （class integer）同時用人犯名稱為每個元素命名，且documentCount_eachVictim必需是由大排到小的結果。
+```{r ans23}
+# documentCount_eachVictim
+
+```
+
+後記：人犯名單裡被提到最多次的是誰？他/她有什麼有趣的故事？（同學有興趣考完可以自己去wiki一下）
+
+## 3. 開課資料
+
+執行以下程序引入臺北大學100-107學年的開課資料courseStructure，及隨機產生後面分析所需的入學年度entranceYear及系別major：
+```{r data3}
+jsonlite::fromJSON("https://www.dropbox.com/s/7myzzdnoor21hye/courseStructure2.json?dl=1") -> courseStructure
+source("https://www.dropbox.com/s/pc8qg2phs3ypcr8/midterm108_2.R?dl=1", encoding="UTF-8")
+```
+
+### 3.1 應修系級
+請由「應修系級」粹取出所有可能但「不重覆」的學系及年級組合，即取出的字串只會是"...系X"或"法律學系...組X"形式，其中X可以是1-4的任何數字，把結果存在majorGradeCombos（class character）。(系一定要有,數字也要有，但有些有AB班，如"經濟系1A"，"經濟系1B"，只要取出"經濟系1"即可，不用管AB字眼。另外，結果會有"...輔系X"字眼，不用剔除。)
+
+```{r ans31}
+# majorGradeCombos
+str(courseStructure)
+regex_a <- "[\u4E00-\u9FFF]+系[1-4]{1}"
+majorGradeCombos<-str_extract(courseStructure$`應修系級`,regex_a)
+majorGradeCombos
+```
+
+### 3.2 經濟系學生
+100學年入學之經濟系學生，一年級規劃的課為100學年且應修系級有「經濟系1」的科目，二年級規劃的課為101學年且應修系級有「經濟系2」的科目，三年級為102學年且應修系級有「經濟系3」，四年級為103學年且應修系級有「經濟系4」。
+
+請找出101學年入學的經濟系學生在3年級時系上為他規劃的課程所有科目名稱，並把所有可能但不重覆的科目名稱存在econ101junior（class character）
+```{r ans32}
+# econ101junior
+str(courseStructure)
+pick_a <- courseStructure$`學年`=="103"
+pick_b <- courseStructure$`應修系級`=="經濟系3A"
+pick_c <- courseStructure$`應修系級`=="經濟系3B"
+econ101junior <- courseStructure$`科目名稱`[pick_a&pick_b&pick_c]
+econ101junior
+```
+
+
+### 3.3 各系課程規劃
+在一開始引入資料時，你的Global Environment同時也隨機產生了entranceYear（入學年）及major（系別）兩個物件，請建立一個coursesOffered物件，它是個list，裡面有4個元素（每個元素class character）分別代表major這個系對entranceYear學年入學的學生一～四年級所規劃課程「科目名稱」，同一年級科目名稱不重覆陳列。（參考提示: 對c(1,2,3,4)進行map操作）
+
+```{r ans33}
+# coursesOffered
+```

@@ -1,0 +1,202 @@
+---
+title: "homework 5"
+output: html_document
+params:
+  studentName: "陳柔均"
+  studentID: "410873119"
+editor_options: 
+  chunk_output_type: console
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+
+  2. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 每次作業滿分10分：有寫作業於期限內上傳得3分，剩餘7分依作業準確率決定最後得分多寡，除非該題另有規定。
+
+> 前述存檔與frontmatter要求缺任何一個則扣1分。
+
+請先執以下code chunk, 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(jsonlite); library(lubridate); library(readr); library(stringr); 
+```
+
+
+# 題目
+
+## 1 平均身高  
+以下是來自政府開放資料平台的台灣[學生5-16歲身高平均值](https://data.gov.tw/dataset/6283)
+```{r data1}
+jsonlite::fromJSON("https://www.dropbox.com/s/es19f62rijrd8i7/studentHeight.json?dl=1") -> studentHeights
+```
+
+### 1.1  類別調整
+請將「學年度」及「年齡」都改成ordered factor, levels順序以其文字數值從小排到大。( 答案物件studentHeights本身)
+
+```{r ans11}
+# studentHeights
+studentHeights$`學年度` <- factor(studentHeights$`學年度`,levels =(96:106),order=T)
+studentHeights$`年齡` <- factor(studentHeights$`年齡`,levels
+=(6:15),order=T)
+levels(studentHeights$`學年度`)
+levels(studentHeights$`年齡`)
+```
+
+### 1.2 年齡層
+請在studentHeights新增「年齡層」元素（class ordered factor），其類別排序為6-8 < 9-12 < 13-15三類年齡層。
+```{r ans12}
+# studentHeights$`年齡層`
+studentHeights$`年齡層` <- 
+  factor(studentHeights$`年齡層`,
+    levels=c("6-8","9-12","13-15"),
+    ordered=T)
+
+studentHeights$`年齡層`
+```
+
+### 1.3 各年齡層平均身高
+請創造一個named numeric vector, averageHeightByGroup (class numeric, length=3) 其值分別是三組年齡層各自所包含年齡下不分性別身高的平均（即第一個值是所有6-8歲不分學年度、不分性別身高（總計身高）的平均，再來是9-12歲，最後是13-15歲），而此vector的元素名稱也分別是"6-8", "9-12", "13-15" (hint: 數值向量x元素平均, 可用mean(x)求得； 這題也考驗同學組合數個「要不要」向量`pick_XXX`)
+
+```{r}
+pick_68 <- studentHeights$`年齡層` == "6-8"
+average68 <- mean(studentHeights$`平均身高`[pick_68]) 
+pick_912 <- studentHeights$`年齡層` == "9-12"
+average912 <- mean(studentHeights$`平均身高`[pick_912]) pick_1315 <- studentHeights$`年齡層` == "13-15"
+average1315 <- mean(studentHeights$`平均身高`[pick_1315])  
+averageHeightByGroup <-
+  c("6-8"=average68,"9-12"=average912,"13-15"=average1315) 
+averageHeightByGroup
+
+
+```
+
+### 1.4 性別差異
+請創造一個named numeric vector, genderDifferenceByAge (class numeric, length=3) 其值分別是三組年齡層各自所包含年齡下的「男性平均」減去「女性平均」（即第一個值是所有6-8歲不分學年度的男女平均差異，再來是9-12歲，最後是13-15歲），而此vector的元素名稱也分別是"6-8", "9-12", "13-15" (hint: 數值向量x元素平均, 可用mean(x)求得)
+```{r}
+gender_a <- mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_68]] == "男"]) - mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_68]] == "女"]) 
+
+gender_b <- mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_912]] == "男"]) - mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_912]] == "女"]) 
+
+gender_c <- mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_1315]] == "男"]) - mean(studentHeights$`平均身高`[studentHeights$`類別`[studentHeights$`平均身高`[pick_1315]] == "女"]) 
+heightDifferenceByGroup <- c("6-8"=a,"9-12"=b,"13-15"=c) 
+
+heightDifferenceByGroup
+
+```
+
+
+## 2 各學系
+
+```{r data2}
+jsonlite::fromJSON("https://www.dropbox.com/s/bp0w8tjgrhi79x7/sameMajorDifferentWritings.json?dl=1") -> differentMajors
+```
+
+### 2.1 改系名
+請寫下「一個」字串的regex字串向量，稱之為realEstateRegex （class character, length=1）,
+
+```{r ans21}
+# realEstateRegex
+differentMajors
+realEstateRegex <-"不動產?與?城?鄉?環?境?學?系"
+realEstateRegex
+```
+
+使得執行以下程序後differentMajors裡屬「不動產與城鄉環境學系（不管何種寫法）」的都會變成"不動系"。這裡regex還有一個限制考驗，就是：「不動產與城鄉環境學系」的十個字都只會出現一次（所以不能寫"(不動系|不動產系|...)"之類的——不、動、系三字出現二次，違規）。(hint: 這題使用regex quantifier裡的`?`會容易很多)
+```{r}
+str_replace(differentMajors,realEstateRegex,"不動系")
+```
+
+
+
+### 2.2 factor levels
+直接將differentMajors轉成factor, 並將它的levels存在currentLevels（class character）。（雖然同系有不同叫法而形成好幾個levels，這題不用去整併它。）
+```{r ans22}
+# currentLevels
+currentLevels <- levels(factor(differentMajors))
+currentLevels
+```
+
+
+### 2.3 商學院
+請寫下「一個」字串的regex（class character, length=1）稱之為bSchoolRegex,
+
+```{r ans23}
+# bSchoolRegex
+bSchoolRegex <- "休閒與運動管理學系|休運系|金融系|金融與合作經營學系|金融與合作學系"
+
+```
+
+使得執行以下程序後currentLevels裡屬商學院的系都會變成"商學院"。（其實此題也可以要求第一題的限制，但怕難度太高這題則不設「系名字元不重覆」的限制）
+```{r}
+str_replace(currentLevels,bSchoolRegex,"商學院")
+```
+
+
+
+### 2.4 改所有系名
+請統一differentMajors裡的系名如下：
+  休運系，金融系，經濟系，社會系，社工系，公行系，不動系
+  
+這題不限方法或regex使用次數。（答案物件differentMajors本身, class factor）
+```{r ans24}
+# differentMajors
+lei_regex <- "休閒與運動管理學系|休運系"
+fi_regex <- "金融系|金融與合作經營學系|金融與合作學系"
+eco_regex <- "經濟學系|經濟系"
+soc_regex <-"社會系|社會學系"
+socw_regex <- "社工系|社會工作學系"
+ad_regex <- "公共行政系|公共行政暨政策學系|公行系"
+est_regex <- "不動系|不動產城鄉學系|不動產與城鄉環境學系"
+
+differentMajors -> currentLevels
+
+currentLevels <- str_replace(currentLevels, 
+           lei_regex , "休運系")
+currentLevels <- str_replace(currentLevels, 
+           fi_regex , "金融系")
+currentLevels <- str_replace(currentLevels, 
+           eco_regex , "經濟系")
+currentLevels <- str_replace(currentLevels, 
+           soc_regex , "社會系")
+currentLevels <- str_replace(currentLevels, 
+           socw_regex , "社工系")
+currentLevels <- str_replace(currentLevels, 
+           ad_regex, "公行系")
+differentMajors <- str_replace(currentLevels, 
+           est_regex , "不動系")
+
+
+differentMajors
+
+```
+
+
+### 2.5 學院factor
+另創一個school物件（class factor），它的每個元素對應differentMajors學系所屬之學院：
+
+  * 商學院：包含休運系，金融系
+  
+  * 社科院：包含經濟系，社會系，社工系
+  
+  * 公共事務學院： 包含公
+```{r ans24}
+# school
+a <- "經濟系|社會系|社工系"
+b <- "公行系|不動系"
+differentMajors<-str_replace(differentMajors,
+                             bSchoolRegex,"商學院")
+differentMajors<-str_replace(differentMajors,
+                             a,"社科院")
+differentMajors<-str_replace(differentMajors,
+                             b,"公共事務學院")
+school <- factor(differentMajors)
+levels(school)
+```
+

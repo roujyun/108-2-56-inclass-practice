@@ -1,0 +1,213 @@
+---
+title: "chen5"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+demand <- # 創造一個物件叫demand
+  function(p){ # 定義這個物件為函數
+    q_d <- 10-5*p # 小心是5*p, 不能寫5p
+  }
+```
+```{r}
+# p=1.2的需求量
+demand(1.2) 
+# p=1.3的需求量
+demand(1.3)
+# p=1.4的需求量
+demand(1.4)
+```
+```{r}
+demand_return <- 
+  function(p){
+    q_d <- 10-5*p
+    return(q_d)
+  }
+# 印在螢幕，但Global Environment並不會有q_d
+demand_return(1.2)
+```
+```{r}
+# 要長久存在Global Environment要指定物件名稱（不要求與q_d同名）
+demand_return(1.2) -> q_d1.2
+q_d1.2
+```
+```{r}
+demand_return(1.2) -> q_d1.2 # 相當於
+4 -> q_d1.2
+```
+```{r}
+q_d <- 5
+demand_return(p=1.2)
+
+print(q_d)
+```
+```{r}
+library(lubridate)
+dateInput <- lubridate::today()
+locationInput <- "新北市"
+```
+```{r}
+jsonlite::fromJSON("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization=rdec-key-123-45678-011121314&format=JSON") ->
+  weather_next36hours
+```
+```{r}
+# 找出符合地點的天氣資訊：weatherAtLocation
+(weather_next36hours$cwbopendata$dataset$location$locationName == locationInput) -> pick_location # 可挑出locationInput的「要/不要」向量
+
+weather_next36hours$cwbopendata$dataset$location$weatherElement[pick_location][[1]] -> weatherAtLocation
+
+# 在weatherAtLocation找出符合時間的天氣資訊
+
+(weatherAtLocation$elementName=="MaxT") ->
+  pick_MaxT
+(weatherAtLocation$elementName=="MinT") ->
+  pick_MinT
+weatherAtLocation$time[pick_MaxT][[1]]$parameter$parameterName[[1]] -> maxT
+weatherAtLocation$time[pick_MinT][[1]]$parameter$parameterName[[1]] -> minT
+
+glue::glue("{locationInput} {dateInput} 氣溫，最高{maxT}度，最低{minT}度。")
+```
+```{r}
+askSilly_weather <- function(locationInput,dateInput){
+  jsonlite::fromJSON("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization=rdec-key-123-45678-011121314&format=JSON") ->
+  weather_next36hours
+  
+  (weather_next36hours$cwbopendata$dataset$location$locationName == locationInput) -> pick_location
+  
+  weather_next36hours$cwbopendata$dataset$location$weatherElement[pick_location][[1]] -> weatherAtLocation
+  (weatherAtLocation$elementName=="MaxT") ->
+    pick_MaxT
+  (weatherAtLocation$elementName=="MinT") ->
+    pick_MinT
+  weatherAtLocation$time[pick_MaxT][[1]]$parameter$parameterName[[1]] -> maxT
+  weatherAtLocation$time[pick_MinT][[1]]$parameter$parameterName[[1]] -> minT
+  
+  glue::glue("{locationInput} {dateInput} 氣溫，最高{maxT}度，最低{minT}度。")
+}
+```
+```{r}
+askSilly_weather("臺中市",today())
+askSilly_weather("花蓮縣",today())
+```
+```{r}
+now()
+what_time_it_is("Europe/Paris")
+```
+```{r}
+class(demand_return)
+```
+```{r}
+# 查詢函數formals arguments要求
+formals(askSilly_weather)
+```
+```{r}
+# 查詢函數主體
+body(askSilly_weather)
+```
+```{r}
+learning_topics <- 
+  list(
+    subject="函數",
+    date=lubridate::ymd("2020-06-03"),
+    functionsCreated=list(
+      demand=demand_return # 等號右邊是呼叫demand_return的定義值，也就是function(...){...}值定義本身。
+    )
+  )
+```
+```{r}
+learning_topics$functionsCreated$demand(1.2)
+```
+```{r}
+typeof(demand_return)
+```
+```{r}
+# 查詢函數執行所要求環境
+environment(demand_return)
+```
+```{r}
+# 若函數執行需要Global environment已存在某些物件，查詢需要哪些物件
+codetools::findGlobals(demand_return)
+```
+```{r}
+intercept <- 10
+slope <- -5
+myDemand <- function(p){
+  q_d <- intercept + slope*p
+  return(q_d)
+}
+```
+```{r}
+environment(demand_return)
+environment(myDemand)
+```
+```{r}
+codetools::findGlobals(demand_return)
+codetools::findGlobals(myDemand) 
+
+# myDemand對Global environment的要求多了intercept及slope
+```
+```{r}
+# 移除global environment裡的intercept及slope
+rm(intercept, slope)
+```
+```{r}
+demand_return(1.2) # 維持正常運作
+```
+
+```{r}
+myDemand(1.2) # 無法運作
+```
+```{r}
+intercept <- 10
+slope <- -5
+myDemand(1.2)
+```
+```{r}
+slope <- -1
+myDemand(1.2)
+```
+```{r}
+intercept <- 5
+slope <- -1.2
+myDemand(1.2)
+```
+```{r}
+myDemand2 <- function(p, intercept=10, slope=-5){
+  q_d <- intercept + slope*p
+  return(q_d)
+}
+```
+```{r}
+environment(myDemand2)
+codetools::findGlobals(myDemand2) # 不依靠global env裡的intercept/slope
+```
+```{r}
+myDemand2(1.2)
+myDemand2(1.2, slope=-1)
+myDemand2(1.2, intercept=5, slope=-1.2)
+```
+

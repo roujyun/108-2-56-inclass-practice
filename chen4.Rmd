@@ -48,9 +48,11 @@ sort(
 sort(
   str_sub(char2,2,2)
 )
+
+str_view_all("hello world","h")
 ```
+#Sys.setlocale(category = "LC_ALL", locale = "English")
 ```{r}
-Sys.setlocale(category = "LC_ALL", locale = "English")
 Sys.getlocale("LC_COLLATE")
 ```
 ```{r}
@@ -261,6 +263,107 @@ factor1
 ```
 ```{r}
 forcats::fct_c(factor1, factor2)
+```
+```{r}
+library(purrr)
+```
+```{r}
+example <- list(
+  name=c("小明","小花","小新","美美"),
+  height=c(175,166,170,160),
+  weight=c(77,NA,60,43),
+  birthday=lubridate::ymd(c("1998-03-11","1999-12-22","1995-08-22","2001-10-10")),
+  hobby=c("美食 旅遊","旅遊 時尚","3C 美食","音樂 旅遊"),
+  residence=c("Taipei","New Taipei","Taichung","Kaohsiung"),
+  allowance=factor(c("0-1000","1001-2000","2000+","1001-2000")),
+  bloodType=c("A","B","B","O")
+)
+```
+
+```{r}
+pick_小新 <- example$name == "小新"
+data_selected <- 
+  list(
+    name=example$name[pick_小新],
+    weight=example$weight[pick_小新],
+    height=example$height[pick_小新],
+    hobby=example$hobby[pick_小新],
+    residence=example$residence[pick_小新],
+    allowance=example$allowance[pick_小新],
+    bloodType=example$bloodType[pick_小新]
+  )
+```
+```{r}
+map(example, ~.x[pick_小新]) -> 
+  data_selected 
+  
+data_selected
+```
+```{r}
+jsonlite::fromJSON("https://www.dropbox.com/s/6252gbdnv9owljm/dance.json?dl=1", simplifyDataFrame = F) -> dance
+```
+```{r}
+map(dance, ~.x$title) ->
+  list_titles
+
+View(list_titles)
+```
+```{r}
+map(dance,~length(.x$showInfo)) ->
+  list_numberOfShows 
+  
+View(list_numberOfShows)
+```
+```{r}
+str(dance[[4]]$showInfo)
+```
+```{r}
+map(dance[[4]]$showInfo, ~ .x$time) ->
+  
+list_showTimes_dance4
+```
+```{r}
+x <- c(1,5,8)
+y <- c(5,8)
+
+# x裡的元素值是不是屬於y集合
+x %in% y
+```
+```{r}
+# 由cities創出每個元素對應的北部、東部、中部region factor
+cities <- factor(c("台北","花蓮","台東","台中"))
+levels(cities)
+```
+```{r}
+region <- cities
+
+# 以下為一連串的pipe operation
+levels(region) -> currentLevels
+str_replace(currentLevels,"台北","北部") -> currentLevels1
+str_replace(currentLevels1,"花蓮|台東","東部") -> currentLevels2
+str_replace(currentLevels2,"台中","中部") -> regionLevels
+regionLevels -> levels(region)
+```
+```{r}
+levels(region) %>% 
+  str_replace(.,"台北","北部") %>%
+  str_replace(.,"花蓮|台東","東部") %>%
+  str_replace(.,"台中","中部") ->
+  levels(region)
+```
+```{r}
+levels(region) %>%
+  str_replace(.,"台北","北部") %>%
+  str_replace(.,"花蓮|台東","東部") %>%
+  str_replace(.,"台中","中部") ->
+  levels(region)
+```
+```{r}
+levels(region) %>% 
+  str_replace("台北","北部") %>%
+  str_replace("花蓮|台東","東部") %>%
+  str_replace("台中","中部") -> 
+  levels(region)
 ```
 
 

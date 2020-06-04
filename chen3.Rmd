@@ -539,6 +539,7 @@ str_extract(addresses,"[0-9]+(?=號)")
 
 [\u4E00-\u9FFF] 代表所有中日韓文字字元。
 ```{r}
+library(stringr)
 str_extract_all(
   "我的名字8293叫17380小abce明",
   "[\u4E00-\u9FFF]+")
