@@ -210,4 +210,21 @@ myDemand2(1.2)
 myDemand2(1.2, slope=-1)
 myDemand2(1.2, intercept=5, slope=-1.2)
 ```
+```{r}
+if(condition){
+  Body for TRUE
+  }
+```
+```{r}
+# 先執行此行輸入學號
+readline(prompt = "請輸入你的學號") -> studentId 
+
+# 之後才執行以下程式
+if(
+  str_detect(studentId,'^[43](1[01][0-9]|9[0-9])[0-9]{5}$',negate=T) # condition: 是否輸入學號正確？
+) {
+  warning("你所輸入的學號不正確")
+}
+```
+
 
