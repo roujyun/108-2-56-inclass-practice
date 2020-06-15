@@ -1,0 +1,238 @@
+---
+title: "homework 7"
+output: html_document
+params:
+  studentName: "你的名字"
+  studentID: "你的學號"
+---
+
+# 注意事項
+
+存檔與填寫注意事項：
+
+假設你叫王小明，學號41078392。
+
+  1. 有些同學可能家裡電腦不是utf-8設定，為防萬一，請於存檔時使用：File > save with enconding, 然後選utf-8
+
+  2. 本文檔開始的Frontmatter中，studentID（即key）其value目前為"你的學號"，以上面學號為例則必需改成"41078392"；而studentName（key）其value目前為"你的名字"，以上面名字為例則必需改成"王小明"
+  
+> 每次作業滿分10分：有寫作業於期限內上傳得3分，剩餘7分依作業準確率決定最後得分多寡，除非該題另有規定。
+
+> 前述存檔與frontmatter要求缺任何一個則扣1分。
+
+請先執以下code chunk, 引入所需packages，答案禁止引用其他套件（Package）。
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, eval=F)
+library(readr); library(stringr); library(purrr); library(magrittr); library(lubridate)
+```
+
+# 題目
+
+## 1. 立方體表面積
+
+### 1.1 單一立方體表面積
+立方體的表面積計算方式為六個面的面積加總，請計算長寬高分別為20,10,15的立方體A的表面積，並將結果存到surface_A(class integer)。
+```{r ans11}
+# surface_A
+```
+
+### 1.2 立方體表面積計算機
+請寫一個叫做surface_cube的function，它的功能是在你輸入長寬高後能自動回傳表面積的值，比如輸入surface_cube(20,10,15)，執行結果應該出現和你1.1計算出來一樣值。
+```{r ans12}
+# surface_cube
+```
+
+## 2 口罩實名制
+以下資料為10個虛擬身分證字號：
+```{r data2}
+read_csv("https://www.dropbox.com/s/9xzccsvwrnctzul/mask.csv?dl=1") -> Mask
+```
+
+### 2.1 單雙號判斷
+請取出Mask裡的第一個身分證字號並用程式判斷他的單雙號，將結果儲存在1st_odd_or_even(class integer,length = 1)。
+單號請用1表示、雙號則用0表示。
+```{r ans21}
+# `1st_odd_or_even`
+```
+
+### 2.2 身分證末碼判斷function
+請寫一個叫做odd_or_even的function，它的功能是在你輸入身分證字號後能自動回傳其末碼屬於單數還是雙數(單雙數表示法同2.1)，比如輸入
+odd_or_even(Mask$身分證字號[[1]])，執行結果應該出現和你2.1計算出來的一樣。
+```{r ans22}
+# odd_or_even
+```
+
+### 2.3 口罩實名制1.0—購買口罩日期
+在lubridate中`today()`可以查詢今天的日期；查詢某日為一周中的第幾天的方式則為`wday()`，其中1代表星期天、7代表星期六，以下資料為其對照表。
+```{r data23}
+data.frame(
+  weekday = str_c("星期",c("天","一","二","三","四","五","六")),
+  number = c(1:7)
+) -> weekday_chart
+```
+
+在口罩實名制1.0中，規定「身分證字號末碼雙號者（0、2、4、6、8）可於每週二、四、六購買；單號者（1、3、5、7、9）可於每週一、三、五購買；週日則開放全民皆可購買(摘自wiki)」，試判斷Mask裡的第一個身分證字號在實名制1.0之下，下一次可購買口罩的日期(含本日)，並將結果存在1st_next_date(class Date)。
+
+提示：
+```
+chart <- list(
+  `雙` = c(1,3,5,7),
+  `單` = c(1,2,4,6)
+)
+chart[[odd_or_even(Mask$身分證字號[[1]])+1]]
+```
+這題非常有挑戰性喔!
+```{r ans23}
+# 1st_next_date
+```
+
+### 2.4 口罩實名制1.0—口罩購買日期查詢機
+請寫一個叫做next_date的function，它的功能是在你輸入身分證字號後能自動回傳該身份證字號下次可購買口罩的日期(含本日)並加上星期，表示格式為"年-月-日,星期幾"，比如助教今天2020/06/09輸入next_date(Mask$身分證字號[[1]])，執行結果應該出現"2020-06-09,星期二"。
+如果R環境設定為英文則會出現"2020-06-09,Tuesday"。
+
+也可以輸入自己或家人朋友的身分證字號玩看看，如果都沒問題的話你就已經能寫出一個時下流行的口罩小app了呢!
+```{r ans24}
+# next_date
+```
+
+## 3. 各系課程規劃
+
+執行以下程序可以得到臺北大學100-107學年的開課資料courseStructure：
+```{r data3}
+jsonlite::fromJSON("https://www.dropbox.com/s/7myzzdnoor21hye/courseStructure2.json?dl=1") -> courseStructure
+```
+
+100學年入學之經濟系學生，一年級規劃的課為100學年且應修系級有「經濟系1」的科目，二年級規劃的課為101學年且應修系級有「經濟系2」的科目，三年級為102學年且應修系級有「經濟系3」，四年級為103學年且應修系級有「經濟系4」。
+
+### 3.1 查詢系課程規劃
+
+請架構一個get_courses(entranceYear, major) 函數：
+
+  Arguments:
+  
+    * entranceYear: class integer, 入學年
+    
+    * major: 學系
+    
+  Value：函數回傳一個list of 4 elements, 記載該學系該入學年學生一到四年級的系上規劃科目名稱，有如下的結構：
+  
+```{r}
+list(
+  year1=一年級不重覆科目名稱（class character）,
+  year2=二年級不重覆科目名稱（class character）,
+  year3=三年級不重覆科目名稱（class character）,
+  year4=四年級不重覆科目名稱（class character）
+)
+
+```
+
+
+```{r ans31}
+# get_courses
+```
+
+### 3.2 使用自創函數
+
+以下的程式「非空行」處有些錯誤，請修正它。修正原則為：
+
+  * 不改變現有編排，如縮排，空行
+  
+  * 不增減程序行
+
+  * 維持原流程思維
+
+正確的程序最後會得到list_major?_allYears,
+
+```{r ans32c}
+majors <- c("經濟系","社學系","社工系")
+entranceYears <- 100:103
+
+# 三系對100-103學年入學學生的四個年級課程規劃
+
+# 針對entranceYears裡每一個元素一一代到get_course函數
+# 求得經濟系100-103入學年學生的系課程規劃科目種類
+entranceYears %>% 
+  map(~get_courses(entranceYear, major)) -> 
+  list_major1_allYears # 經濟系
+
+# 針對entranceYears裡每一個元素一一代到get_course函數
+# 求得社會系100-103入學年學生的系課程規劃科目種類
+entranceYears %>% 
+  map(~get_courses(entranceYear, major)) -> 
+  list_major2_allYears # 社會系
+
+# 針對entranceYears裡每一個元素一一代到get_course函數
+# 求得社工系100-103入學年學生的系課程規劃科目種類
+entranceYears %>% 
+  map(~get_courses(entranceYear, major)) -> 
+  list_major3_allYears # 社工系
+
+```
+
+其中？=1代表經濟系，2代表社會系，3代表社工系，每個list會有4個元素分別代表100-104入學年，而每個入學年元素本身又是一個list of 4，代表該入學年學生在「一～四」年級的系規劃課程科目稱種類—— 即執行`str(list_major1_allYears)`會看到：
+
+```
+List of 4
+ $ :List of 4
+  ..$ year1: chr [1:14] "男生軍訓１" "微積分" "女生軍訓１"...
+  ..$ year2: chr [1:6] "統計學" "資料處理" "線性代數" ...
+  ..$ year3: chr [1:22] "經濟套裝軟體（一）"  ...
+  ..$ year4: chr [1:8] "經濟成長" "商事法"  ...
+ $ :List of 4
+  ..  :
+ $ :List of 4
+  ..  :
+ $ :List of 4
+  ..  :
+```
+
+### 3.3 map map
+
+上一題每個系透過map可以一口氣將不同入學年一一計算完，但最後還是手動針對每個系copy/paste數次。我們可以將針對一個系去算不同入學年結果的程序訂義成一個函數get_coursesAllYears(entranceYears, major):
+
+Arguments:
+
+  * entranceYears: class integer or character, 每個元素值是一個入學年。
+  
+  * major: class character, 一個系名稱
+  
+Value: 回傳一個list如前一題的list_major?_allYears物件，它記載major系在entranceYears所包含各入學年的系一到四年級課程規劃
+
+以下程序透過它可以用較少程序完成與3.2題相同結果，只不過它有錯，請修正它。修正原則為：
+
+  * 不改變現有編排，如縮排，空行
+  
+  * 不增減程序行
+  
+  * 維持原流程思維
+
+```{r ans33c}
+get_coursesAllYears <- function(entranceYears, major){
+  # 可以針對「單一」major系對entranceYears裡不同入學年一一求算該系對該入學年學生的系課程規劃科目種類
+  
+  entranceYears %>% 
+    map(~get_courses(entranceYear, major)) -> 
+    list_major1_allYears 
+  return(list_major1_allYears)
+}
+
+# 一一將majors裡的系取出進行get_coursesAllYears運算以得到「取出系」在不同entranceYears入學年下的系課程規劃。
+majors %>% 
+  map(~get_coursesAllYears(entranceYears, major)) -> list_coursesAllMajorsAllYears
+
+```
+
+
+### 3.4 科目種類變化
+
+計算經濟系100-103學年入學學生他們在大一到大四系上為他規劃的科目名稱各年級有幾種，答案存在物件list_econCourseCounts，它是個list of 5 elements:
+
+  * entranceYear=100:103
+  
+  * year1＝c(100學年入學一年級的科目種類, 101學年入學一年級的科目種類, 102學年入學一年級的科目種類, 103學年入學一年級的科目種類)
+  
+  * 「year2, year3, year4」如year1, 分別是100-103學年入學「二、三、四」年級的科目種類「數目」，即該年級可供學生選的不同科目名稱有幾個。
+  
+```{r ans34}
+# list_econCourseCounts
+```
